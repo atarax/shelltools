@@ -1,23 +1,16 @@
-# If you come from bash you might have to change your $PATH.
-# export PATH=$HOME/bin:/usr/local/bin:$PATH
+# Path to your oh-my-zsh installation.S
+export ZSH=/home/tk/.oh-my-zsh
 
-# Path to your oh-my-zsh installation.
-  export ZSH=/home/cite/.oh-my-zsh
-
-# Set name of the theme to load. Optionally, if you set this to "random"
-# it'll load a random theme each time that oh-my-zsh is loaded.
-# See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
+# Set name of the theme to load.
+# Look in ~/.oh-my-zsh/themes/
+# Optionally, if you set this to "random", it'll load a random theme each
+# time that oh-my-zsh is loaded.
 ZSH_THEME="agnoster"
-
-# Set list of themes to load
-# Setting this variable when ZSH_THEME=random
-# cause zsh load theme from this variable instead of
-# looking in ~/.oh-my-zsh/themes/
-# An empty array have no effect
-# ZSH_THEME_RANDOM_CANDIDATES=( "robbyrussell" "agnoster" )
+# ZSH_THEME="bureau"
+#ZSH_THEME="tk-custom"
 
 # Uncomment the following line to use case-sensitive completion.
-# CASE_SENSITIVE="true"
+CASE_SENSITIVE="true"
 
 # Uncomment the following line to use hyphen-insensitive completion. Case
 # sensitive completion must be off. _ and - will be interchangeable.
@@ -58,15 +51,16 @@ ZSH_THEME="agnoster"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(
-  git
-)
-
-source $ZSH/oh-my-zsh.sh
+plugins=(git)
 
 # User configuration
 
+# export PATH="/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
 # export MANPATH="/usr/local/man:$MANPATH"
+
+export PATH="/home/tk/sonar/bin:$PATH"
+
+source $ZSH/oh-my-zsh.sh
 
 # You may need to manually set your language environment
 # export LANG=en_US.UTF-8
@@ -82,7 +76,7 @@ source $ZSH/oh-my-zsh.sh
 # export ARCHFLAGS="-arch x86_64"
 
 # ssh
-# export SSH_KEY_PATH="~/.ssh/rsa_id"
+# export SSH_KEY_PATH="~/.ssh/dsa_id"
 
 # Set personal aliases, overriding those provided by oh-my-zsh libs,
 # plugins, and themes. Aliases can be placed here, though oh-my-zsh
@@ -93,8 +87,126 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-# Z
-. /usr/local/bin/z.sh
+########################
+# ZShell configuration #
+########################
 
-# Kubernetes
-alias kl="kubectl"
+zstyle ':completion:*' special-dirs true
+
+##########
+# Docker #
+##########
+
+alias dssh="cd ~/plista/platforms-control && make shell"
+alias dimessh="~/plista/platforms-control/tasks/ssh_dime1"
+alias dc="docker-compose"
+
+##################
+# Plista-Release #
+##################
+
+doReleaseCommitWithAutoMessage() {
+  git commit -am "$(dpkg-parsechangelog --show-field Source) ($(dpkg-parsechangelog --show-field Version))"
+}
+
+minorRelease() {
+  echo "Please enter reason for release:"
+  read message
+  dch -D stable -u low -i --no-auto-nmu $message
+  doReleaseCommitWithAutoMessage
+  git push
+}
+
+genericRelease() {
+  fromBranch=$1
+  toBranch=$2
+  echo "checking out $toBranch..."
+  git checkout $toBranch
+  echo "pulling changes..."
+  git pull origin $toBranch -X theirs
+  echo "checking out $fromBranch..."
+  git checkout $fromBranch
+  echo "pulling changes..."
+  git pull origin $fromBranch -X theirs
+  echo "merging $toBranch into $fromBranch to avoid merge-conflicts..."
+  git merge $toBranch
+  echo "checking out $toBranch again..."
+  git checkout $toBranch
+  echo "merging $fromBranch..."
+  git merge $fromBanch
+  
+  if [ "$toBranch" = "master" ]
+  then
+    echo "append to changelog..."
+    dch -D stable -u low --no-auto-nmu -v $(head debian/changelog -n 1 |  grep "(\d+)\.(\d+)" -Po | cut -d . -f 1).$(($(head debian/changelog -n 1 |  grep "\.(\d+)\." -Po | cut -d . -f 2)+1)).0 General Release
+    echo "making the release-commit..."
+    doReleaseCommitWithAutoMessage
+  fi
+
+  echo "pushing to repo..."
+  git push
+  echo "pushing $fromBranch to transfer the changes from master (cherrys and changelogs...)"
+  git checkout $fromBranch
+  git push
+  git checkout $toBranch
+  echo "done :) your version is:"
+  echo $(head debian/changelog -n 1)
+}
+
+export EDITOR="vim"
+export DEBFULLNAME="Tobias Kaesser"
+export DEBEMAIL="tk@plista.com"
+alias prmaj="genericRelease master"
+alias prmin="minorRelease"
+alias prbeta="genericRelease next beta-production"
+alias prcheckMaj="git checkout next && git pull && git diff origin/master"
+alias prcheckBeta="git checkout next && git pull && git diff origin/beta-production"
+
+#####################
+# Platforms-Control #
+#####################
+
+PLIATFORMS_CONTROL_PATH="/home/tk/plista/platforms-control" 
+
+alias pfc="cd $PLIATFORMS_CONTROL_PATH && make"
+ 
+#########
+# Hosts #
+#########
+
+alias pssh=sshToPlistaHost
+
+sshToPlistaHost() {
+ ssh plista$1.plista.com
+}
+
+#####
+# z #
+#####
+
+source ~/z.sh
+alias ts="typespeed"
+
+###############
+# pretty json #
+###############
+
+alias json='python -m json.tool'
+
+######################
+# ec2-gitlab-runnter #
+######################
+
+EC2_HOST='10.11.31.223'
+alias sse="ssh -i /home/tk/.ssh/ec2-gitlab.key ec2-user@$EC2_HOST"
+
+#########################
+# kubectl auto-complete #
+#########################
+
+alias kl=kubectl
+alias kl-get-all="kubectl get deployment,svc,pods,pvc"
+source <(kubectl completion zsh)
+
+
+
