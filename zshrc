@@ -1,5 +1,5 @@
 # Path to your oh-my-zsh installation.S
-export ZSH=/home/tk/.oh-my-zsh
+export ZSH=${HOME}/.oh-my-zsh
 
 # Set name of the theme to load.
 # Look in ~/.oh-my-zsh/themes/
@@ -58,7 +58,7 @@ plugins=(git)
 # export PATH="/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
 # export MANPATH="/usr/local/man:$MANPATH"
 
-export PATH="/home/tk/sonar/bin:$PATH"
+export PATH="${HOME}/sonar/bin:$PATH"
 
 source $ZSH/oh-my-zsh.sh
 
@@ -166,7 +166,7 @@ alias prcheckBeta="git checkout next && git pull && git diff origin/beta-product
 # Platforms-Control #
 #####################
 
-PLIATFORMS_CONTROL_PATH="/home/tk/plista/platforms-control" 
+PLIATFORMS_CONTROL_PATH="${HOME}/plista/platforms-control" 
 
 alias pfc="cd $PLIATFORMS_CONTROL_PATH && make"
  
@@ -184,7 +184,7 @@ sshToPlistaHost() {
 # z #
 #####
 
-source ~/z.sh
+source /usr/local/bin/z.sh
 alias ts="typespeed"
 
 ###############
@@ -198,7 +198,7 @@ alias json='python -m json.tool'
 ######################
 
 EC2_HOST='10.11.31.223'
-alias sse="ssh -i /home/tk/.ssh/ec2-gitlab.key ec2-user@$EC2_HOST"
+alias sse="ssh -i ${HOME}/tk/.ssh/ec2-gitlab.key ec2-user@$EC2_HOST"
 
 #########################
 # kubectl auto-complete #
