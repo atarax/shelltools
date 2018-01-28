@@ -204,12 +204,15 @@ alias sse="ssh -i ${HOME}/tk/.ssh/ec2-gitlab.key ec2-user@$EC2_HOST"
 # kubectl auto-complete #
 #########################
 
-alias kl="kubectl"
-alias kld="kubectl describe"
-alias klg="kubectl get"
-alias kld="kubectl delete"
-alias kl-get-all="kubectl get deployment,svc,pods,pvc"
-source <(kubectl completion zsh)
+if [ $(command -v kubectl) ];
+then
+  alias kl="kubectl"
+  alias kld="kubectl describe"
+  alias klg="kubectl get"
+  alias kld="kubectl delete"
+  alias kl-get-all="kubectl get deployment,svc,pods,pvc"
+  source <(kubectl completion zsh)
+fi
 
 
 
