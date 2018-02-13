@@ -180,6 +180,17 @@ sshToPlistaHost() {
  ssh plista$1.plista.com
 }
 
+##########
+# Docker #
+##########
+
+alias dbr=dockerBuildRun
+
+dockerBuildRun() {
+  docker build . -t $1
+  docker run -t $1 $2
+}
+
 #####
 # z #
 #####
@@ -200,9 +211,13 @@ alias json='python -m json.tool'
 EC2_HOST='10.11.31.223'
 alias sse="ssh -i ${HOME}/tk/.ssh/ec2-gitlab.key ec2-user@$EC2_HOST"
 
-#########################
-# kubectl auto-complete #
-#########################
+#######
+# k8l #
+#######
+
+function switchK8LNamespace() {
+  kubectl config set-context $(kubectl config current-context) --namespace=$1  
+}
 
 alias kl="kubectl"
 alias kld="kubectl describe"
@@ -211,5 +226,16 @@ alias kld="kubectl delete"
 alias kl-get-all="kubectl get deployment,svc,pods,pvc"
 source <(kubectl completion zsh)
 
+alias kln=switchK8LNamespace
 
+#########
+#  Helm #
+#########
+source <(helm completion zsh)
 
+######
+# Go #
+######
+
+export GOPATH=$HOME
+export PATH=$PATH:$(go env GOPATH)/bin
