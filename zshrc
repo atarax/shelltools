@@ -220,6 +220,9 @@ function switchK8LNamespace() {
 }
 
 alias kl="kubectl"
+alias klgp="kubectl get pods"
+alias klgs="kubectl get service"
+alias klgd="kubectl get deployment"
 alias kla="kubectl apply"
 alias klaf="kubectl apply -f"
 alias kldf="kubectl delete -f"
