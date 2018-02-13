@@ -219,15 +219,15 @@ function switchK8LNamespace() {
   kubectl config set-context $(kubectl config current-context) --namespace=$1  
 }
 
-if [ $(command -v kubectl) ];
-then
-  alias kl="kubectl"
-  alias kld="kubectl describe"
-  alias klg="kubectl get"
-  alias kld="kubectl delete"
-  alias kl-get-all="kubectl get deployment,svc,pods,pvc"
-  source <(kubectl completion zsh)
-fi
+alias kl="kubectl"
+alias kla="kubectl apply"
+alias klaf="kubectl apply -f"
+alias kldf="kubectl delete -f"
+alias kld="kubectl describe"
+alias klg="kubectl get"
+alias kld="kubectl delete"
+alias kll="kubectl get deployment,svc,pods,pvc"
+source <(kubectl completion zsh)
 
 alias kln=switchK8LNamespace
 
