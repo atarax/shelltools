@@ -220,16 +220,49 @@ function switchK8LNamespace() {
 }
 
 alias kl="kubectl"
+alias kle="kubectl exec -it"
+
 alias klgp="kubectl get pods"
+alias klgpan="kubectl get pods --all-namespaces"
+
 alias klgs="kubectl get service"
+alias klgsan="kubectl get service --all-namespaces"
+alias kles="kubectl edit service"
+alias klds="kubectl describe service"
+alias kldels="kubectl delete service"
+
 alias klgd="kubectl get deployment"
+alias klgdan="kubectl get deployment --all-namespaces"
+alias kled="kubectl edit deployment"
+alias kldd="kubectl describe deployment"
+alias kldeld="kubectl delete deployment"
+
+alias klgi="kubectl get ingress"
+alias klgian="kubectl get ingress --all-namespaces"
+alias klei="kubectl edit ingress"
+alias kldi="kubectl describe ingress"
+alias kldeli="kubectl delete ingress"
+
 alias kla="kubectl apply"
 alias klaf="kubectl apply -f"
-alias kldf="kubectl delete -f"
+alias kldelf="kubectl delete -f"
 alias kld="kubectl describe"
+alias kldel="kubectl delete"
 alias klg="kubectl get"
-alias kld="kubectl delete"
-alias kll="kubectl get deployment,svc,pods,pvc"
+
+alias kldp="kubectl describe pod"
+
+alias klgr="kubectl get routerule"
+alias klgran="kubectl get routerule --all-namespaces"
+alias kler="kubectl edit routerule"
+alias kldr="kubectl delete routerule"
+
+alias kll="kubectl logs"
+
+# get current namespace
+alias klgn="kubectl config view --minify | grep namespace"
+
+alias klla="kubectl get deployment,svc,pods,pvc"
 source <(kubectl completion zsh)
 
 alias kln=switchK8LNamespace
@@ -244,4 +277,5 @@ source <(helm completion zsh)
 ######
 
 export GOPATH=$HOME
+export PATH=$PATH:/usr/local/go/bin/
 export PATH=$PATH:$(go env GOPATH)/bin
