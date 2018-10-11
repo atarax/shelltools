@@ -1,5 +1,5 @@
 # Path to your oh-my-zsh installation.S
-export ZSH=/home/tk/.oh-my-zsh
+export ZSH=${HOME}/.oh-my-zsh
 
 # Set name of the theme to load.
 # Look in ~/.oh-my-zsh/themes/
@@ -58,7 +58,7 @@ plugins=(git)
 # export PATH="/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
 # export MANPATH="/usr/local/man:$MANPATH"
 
-export PATH="/home/tk/sonar/bin:$PATH"
+export PATH="${HOME}/sonar/bin:$PATH"
 
 source $ZSH/oh-my-zsh.sh
 
@@ -162,14 +162,7 @@ alias prbeta="genericRelease next beta-production"
 alias prcheckMaj="git checkout next && git pull && git diff origin/master"
 alias prcheckBeta="git checkout next && git pull && git diff origin/beta-production"
 
-#####################
-# Platforms-Control #
-#####################
 
-PLIATFORMS_CONTROL_PATH="/home/tk/plista/platforms-control" 
-
-alias pfc="cd $PLIATFORMS_CONTROL_PATH && make"
- 
 #########
 # Hosts #
 #########
@@ -180,11 +173,26 @@ sshToPlistaHost() {
  ssh plista$1.plista.com
 }
 
+##########
+# Docker #
+##########
+
+alias dbr=dockerBuildRun
+
+dockerBuildRun() {
+  docker build . -t $1
+  docker run -t $1 $2
+}
+
 #####
 # z #
 #####
 
-source ~/z.sh
+if [ -e /usr/local/bin/z.sh ]
+then
+  source /usr/local/bin/z.sh
+fi
+
 alias ts="typespeed"
 
 ###############
@@ -198,18 +206,85 @@ alias json='python -m json.tool'
 ######################
 
 EC2_HOST='10.11.31.223'
-alias sse="ssh -i /home/tk/.ssh/ec2-gitlab.key ec2-user@$EC2_HOST"
+alias sse="ssh -i ${HOME}/tk/.ssh/ec2-gitlab.key ec2-user@$EC2_HOST"
 
-#########################
-# kubectl auto-complete #
-#########################
+#######
+# k8l #
+#######
 
-alias kl="kubectl"
-alias kld="kubectl describe"
-alias klg="kubectl get"
-alias kld="kubectl delete"
-alias kl-get-all="kubectl get deployment,svc,pods,pvc"
-source <(kubectl completion zsh)
+function switchK8LNamespace() {
+  kubectl config set-context $(kubectl config current-context) --namespace=$1  
+}
 
+if command -v kubectl
+then 
+ 
+  alias kl="kubectl"
+  alias kle="kubectl exec -it"
 
+  alias klgp="kubectl get pods"
+  alias klgpan="kubectl get pods --all-namespaces"
 
+  alias klgs="kubectl get service"
+  alias klgsan="kubectl get service --all-namespaces"
+  alias kles="kubectl edit service"
+  alias klds="kubectl describe service"
+  alias kldels="kubectl delete service"
+
+  alias klgd="kubectl get deployment"
+  alias klgdan="kubectl get deployment --all-namespaces"
+  alias kled="kubectl edit deployment"
+  alias kldd="kubectl describe deployment"
+  alias kldeld="kubectl delete deployment"
+
+  alias klgi="kubectl get ingress"
+  alias klgian="kubectl get ingress --all-namespaces"
+  alias klei="kubectl edit ingress"
+  alias kldi="kubectl describe ingress"
+  alias kldeli="kubectl delete ingress"
+
+  alias kla="kubectl apply"
+  alias klaf="kubectl apply -f"
+  alias kldelf="kubectl delete -f"
+  alias kld="kubectl describe"
+  alias kldel="kubectl delete"
+  alias klg="kubectl get"
+
+  alias kldp="kubectl describe pod"
+
+  alias klgr="kubectl get routerule"
+  alias klgran="kubectl get routerule --all-namespaces"
+  alias kler="kubectl edit routerule"
+  alias kldr="kubectl delete routerule"
+
+  alias kll="kubectl logs"
+
+# get current namespace
+  alias klgn="kubectl config view --minify | grep namespace"
+
+  alias klla="kubectl get deployment,svc,pods,pvc"
+
+  source <(kubectl completion zsh);
+fi
+
+alias kln=switchK8LNamespace
+
+#########
+#  Helm #
+#########
+
+if command -v helm
+then
+  source <(helm completion zsh)
+fi
+
+######
+# Go #
+######
+
+if command -v go;
+then
+  export GOPATH=$HOME
+  export PATH=$PATH:/usr/local/go/bin/
+  export PATH=$PATH:$(go env GOPATH)/bin
+fi
